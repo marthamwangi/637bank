@@ -7,6 +7,7 @@ WITHDRAW: Juma:1648.26 (Withdraw 1648.26 from Juma's account)
 TRANSFER: Wanjiru:Linda:500.00 (Transfer 500.00 from Wanjiru's account to Linda's account)
 
 Deliverables:
+![alt text](https://github.com/marthamwangi/637bank/blob/main/Transactions.png)
 ![alt text](https://github.com/marthamwangi/637bank/blob/main/Balances.png)
 
 [
