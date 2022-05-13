@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken');
+const dotenv = require ('dotenv');
+dotenv.config();
 exports.auth = (req, res,next)=>{
     const token = req.headers['authorization'];
     if(!token){
@@ -9,7 +11,7 @@ exports.auth = (req, res,next)=>{
         );
     }
     try{
-        user = jwt.verify(token, 'secret');
+        user = jwt.verify(token, process.env.JWT_SECRET);
         req.user = user;
         next();
     }
