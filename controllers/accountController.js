@@ -232,16 +232,17 @@ exports.withdrawAmount = async function (req, res) {
 exports.getFinalBalances = async function (req, res) {
     let accounts;
     let balances = [];
-    let user
     try {
-        accounts = await Account.find();
-        await Promise.all(accounts.map(async (acc)=>{
-            user = await User.findById(acc.owner.toString())
-            user = user.userName
-            balances.push({ ACCOUNT: user, BALANCE: acc.balance })      
-        })
-        )
-                res.send(balances)//output []
+        accounts = await Account.find()
+            .populate("owner")
+            .then(user => {
+                for (let i = 0; i < user.length; i++) {
+                    balances.push({ user: user[i].owner.userName, balance: user[i].balance })
+                }
+            }
+            )
+        res.send(balances)
+
     } catch (error) {
         throw error
     }
