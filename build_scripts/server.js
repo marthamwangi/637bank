@@ -10,7 +10,7 @@ const dbURI = process.env.MONGODB_URI;
 const authRoutes = require('../routes/auth.routes');
 const transactionRoutes = require('../routes/transactions.routes');
 const operationsRoutes = require('../routes/operations.routes');
-/**CONNECT*/
+/**CONNECT MONGO*/
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then((result => app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
