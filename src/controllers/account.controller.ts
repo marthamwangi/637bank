@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 const logger = require("pino")();
-const Account = require('../models/Account');
-const User = require('../models/User');
-const Transaction = require('../models/Transaction');
-const { bankAcountGenerate } = require("../utils/index")
+import Account from '../models/Account';
+import User from '../models/User';
+import Transaction from '../models/Transaction';
+import { bankAcountGenerate } from "../utils/index";
 export const createBankAccount = async function (req: Request, res: Response) {
     const { id } = req.user;
     const { pin } = req.body;
