@@ -1,4 +1,5 @@
-const mongoose = require( 'mongoose');const Schema = mongoose.Schema;
+import mongoose from 'mongoose';
+const { Schema } = mongoose;
 
 const Title = {
     DEPOSIT: 'DEPOSIT',
@@ -16,13 +17,13 @@ const TransactionSchema = new Schema({
         type: Number,
         required: true
     },
-     account: {
+    account: {
         type: Schema.Types.ObjectId,
         ref: 'Account'
     },
     description: {
         type: String
     },
-},{timestamps: true});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Transaction', TransactionSchema);

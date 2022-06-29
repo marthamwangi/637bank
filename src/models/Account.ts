@@ -1,4 +1,5 @@
-const mongoose = require( 'mongoose');const Schema = mongoose.Schema;
+import mongoose from 'mongoose';
+const { Schema } = mongoose;
 
 const AccountSchema = new Schema({
     number: {
@@ -23,6 +24,6 @@ const AccountSchema = new Schema({
         type: Number,
         default: null
     },
-   },{timestamps: true});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Account', AccountSchema);

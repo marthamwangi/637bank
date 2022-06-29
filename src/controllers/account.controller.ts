@@ -1,11 +1,13 @@
+import { Request, Response } from "express";
+const logger = require("pino")();
 const Account = require('../models/Account');
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const { bankAcountGenerate } = require("../utils/index")
-exports.createBankAccount = async function (req, res) {
+export const createBankAccount = async function (req: Request, res: Response) {
     const { id } = req.user;
     const { pin } = req.body;
-    let user;
+    let user: any;
     const account = new Account({
         owner: id,
         pin,
@@ -25,16 +27,16 @@ exports.createBankAccount = async function (req, res) {
         user.account = account.id;
         await user.save();
         res.status(201).json({ account })
-    } catch (err) {
-        console.log(err.message);
+    } catch (err: any) {
+        logger.error(err.message);
     }
 
 }
-exports.depositAmount = async function (req, res) {
+export const depositAmount = async function (req: Request, res: Response) {
     const { id } = req.user; //owner
     const { accountId } = req.params; //acc id
     const { amount, description } = req.body;
-    let account;
+    let account: any;
     try {
         account = await Account.findById(accountId);
         //does the account exist?
@@ -63,7 +65,7 @@ exports.depositAmount = async function (req, res) {
 
         res.status(200).send({ description })
 
-    } catch (error) {
+    } catch (error: any) {
         if (error.message.includes('Cast to ObjectId failed for value')) {
             return res.status(400).json({ err: 'Invalid account ID' });
         }
@@ -71,7 +73,7 @@ exports.depositAmount = async function (req, res) {
     }
 
 }
-exports.transferAmount = async function (req, res) {
+export const transferAmount = async function (req: Request, res: Response) {
     const { id } = req.user; //from owner
     const { accountId } = req.params;
     const { amount, pin, accountNumber } = req.body;
@@ -122,8 +124,8 @@ exports.transferAmount = async function (req, res) {
             account.transactions.push(senderTransaction.id);
             await account.save();
         } else {
-            senderDescription = `You have Transferred Amount: ${amount} to ${receiverName.userName}`;
-            receiverDescription = `You have Received Amount: ${amount} from ${user.userName}`;
+            const senderDescription = `You have Transferred Amount: ${amount} to ${receiverName.userName}`;
+            const receiverDescription = `You have Received Amount: ${amount} from ${user.userName}`;
             account.balance -= Number(amount);
             receiver.balance += Number(amount);
             //record to:from transaction
@@ -150,7 +152,7 @@ exports.transferAmount = async function (req, res) {
             await receiver.save();
         }
         res.send({ description });
-    } catch (error) {
+    } catch (error: any) {
         //handle req.params
         if (error.message.includes('Cast to ObjectId failed for value')) {
             return res.status(400).json({ err: 'Invalid account ID' });
@@ -159,7 +161,7 @@ exports.transferAmount = async function (req, res) {
     }
 
 }
-exports.withdrawAmount = async function (req, res) {
+export const withdrawAmount = async function (req: Request, res: Response) {
     const { id } = req.user; //owner
     const { accountId } = req.params;
     const { amount, pin } = req.body;
@@ -220,7 +222,7 @@ exports.withdrawAmount = async function (req, res) {
         res.send({ description });
 
 
-    } catch (error) {
+    } catch (error: any) {
         //handle req.params
         if (error.message.includes('Cast to ObjectId failed for value')) {
             return res.status(400).json({ err: 'Invalid account ID' });
@@ -229,18 +231,18 @@ exports.withdrawAmount = async function (req, res) {
     }
 }
 
-exports.getFinalBalances = async function (req, res) {
+export const getFinalBalances = async function (req: Request, res: Response) {
     try {
         const accounts = await Account.find().populate("owner")
-        const balances = await  Promise.all(
-            accounts.map(account => ({
+        const balances = await Promise.all(
+            accounts.map((account: any) => ({
                 userName: account.owner.userName,
                 balance: account.balance
             }))
         )
         res.send(balances)
 
-    } catch (error) {
+    } catch (error: any) {
         throw error
     }
 }
