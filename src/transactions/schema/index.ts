@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+const ObjectId = mongoose.Schema.Types.ObjectId;
 const { Schema } = mongoose;
 
 const Title = {
@@ -18,7 +19,7 @@ const TransactionSchema = new Schema({
         required: true
     },
     account: {
-        type: Schema.Types.ObjectId,
+        type: ObjectId,
         ref: 'Account'
     },
     description: {

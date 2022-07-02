@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
+const ObjectId = mongoose.Schema.Types.ObjectId;
 const { Schema } = mongoose;
-
 const UserSchema = new Schema({
 
     userName: {
@@ -13,13 +13,14 @@ const UserSchema = new Schema({
         required: true
     },
     account: {
-        type: Schema.Types.ObjectId,
+        type: ObjectId,
         ref: 'Account'
     },
     pin: {
         type: Number
     }
 
+
 }, { timestamps: true });
 
-export default mongoose.model('User', UserSchema);;
+export default mongoose.model('User', UserSchema);

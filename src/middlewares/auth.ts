@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config/config";
 declare module "express" {
     export interface Request {
-        user: any
+        user: any | JwtPayload
     }
 }
 export const auth = (req: Request, res: Response, next: NextFunction) => {
@@ -22,6 +22,6 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
         next();
     }
     catch (error: any) {
-        res.status(401).json({ errors: [{ msg: "invalid token" }] })
+        res.status(401).json({ errors: [{ msg: "Please Authenticate" }] })
     }
 }

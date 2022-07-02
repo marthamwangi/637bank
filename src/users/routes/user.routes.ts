@@ -1,5 +1,5 @@
 var authRouter = require("express").Router();
-import { registerUser, loginUser } from '../controllers/auth.controller';
+import { registerUser, loginUser } from '../../controllers/auth.controller';
 authRouter
     .route('/register')
     .post(registerUser)

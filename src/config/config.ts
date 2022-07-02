@@ -8,7 +8,7 @@ const envVarsSchema = Joi.object()
         NODE_ENV: Joi.string().valid("production", "development", "test").required(),
         PORT: Joi.number().positive().required(),
         MONGO_URL: Joi.string().required(),
-        JWT_SECRET: Joi.string().required().description("637 Api secret")
+        APP_TOKEN: Joi.string().base64().required()
     })
     .unknown()
 const { value: envVars, error } = envVarsSchema
@@ -18,5 +18,5 @@ if (error) {
     throw new Error(`Config Validation Error: ${error.message}`);
 }
 export default {
-    environment: envVars.NODE_ENV, port: envVars.PORT, mongoURL: envVars.MONGO_URL, secret: envVars.JWT_SECRET
+    environment: envVars.NODE_ENV, port: envVars.PORT, mongoURL: envVars.MONGO_URL, secret: envVars.APP_TOKEN
 }

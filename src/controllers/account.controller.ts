@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 const logger = require("pino")();
 import Account from '../models/Account';
-import User from '../models/User';
-import Transaction from '../models/Transaction';
+import User from '../users/schema';
+import Transaction from '../transactions/schema';
 import { bankAcountGenerate } from "../utils/index";
 export const createBankAccount = async function (req: Request, res: Response) {
     const { id } = req.user;
