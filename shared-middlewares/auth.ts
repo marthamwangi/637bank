@@ -22,6 +22,8 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
         next();
     }
     catch (error: any) {
+        res.send(jwt.verify(token, config.secret));
         res.status(401).json({ errors: [{ msg: "Please Authenticate" }] })
     }
+    next();
 }

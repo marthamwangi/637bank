@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+const ObjectId = mongoose.Schema.Types.ObjectId;
 const { Schema } = mongoose;
 
 const AccountSchema = new Schema({
@@ -11,12 +12,12 @@ const AccountSchema = new Schema({
         default: 0
     },
     owner: {
-        type: Schema.Types.ObjectId,
+        type: ObjectId,
         ref: 'User'
     },
     transactions: [
         {
-            type: Schema.Types.ObjectId,
+            type: ObjectId,
             ref: 'Transaction'
         }
     ],

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 const logger = require("pino")();
-import Account from '../models/Account';
+import Account from '../accounts/models/Account';
 import User from '../users/schema';
 import Transaction from '../transactions/schema';
 import { bankAcountGenerate } from "../utils/index";
@@ -39,7 +39,7 @@ export const depositAmount = async function (req: Request, res: Response) {
     let account: any;
     try {
         account = await Account.findById(accountId);
-        //does the account exist?
+        //does the account exist
         if (!account) {
             return res.status(400).json({ msg: 'Bank Account does not exist!' });
         }
@@ -84,20 +84,24 @@ export const transferAmount = async function (req: Request, res: Response) {
     try {
         account = await Account.findById(accountId);
         user = await User.findById(id);
-        //does the account exist?
+        //does the account exist
         if (!account) {
             return res.status(400).json({ msg: 'Bank Account does not exist!' });
         }
-        if (account.owner.toString() !== id) {
-            return res.status(401)
-                .json({
-                    msg: 'Unauthorised'
-                })
+        if (account.owner !== undefined) {
+            if (account.owner.toString() !== id) {
+                return res.status(401)
+                    .json({
+                        msg: 'Unauthorised'
+                    })
+            }
         }
         //set receiver amount
-        let receiver;
+        let receiver
         receiver = await Account.findOne({ number: accountNumber });
-        receiverName = await User.findById(receiver.owner.toString());
+        if (receiver !== null) {
+            receiverName = await User.findById(receiver?.owner?.toString());
+        }
         if (!receiver) {
             return res
                 .status(401)
@@ -110,47 +114,53 @@ export const transferAmount = async function (req: Request, res: Response) {
                 .send({ err: 'Enter pin again!' })
         }
         //check available blance
-        if (account.balance < Number(amount)) {
-            description = description + ' failed due to Insufficient funds';
-            account.balance += 0;
-            const senderTransaction = new Transaction({
-                title: 'TRANSFER',
-                amount,
-                account: accountId,
-                description,
-            });
-            await senderTransaction.save();// from
-            //update sender:receiver transaction
-            account.transactions.push(senderTransaction.id);
-            await account.save();
-        } else {
-            const senderDescription = `You have Transferred Amount: ${amount} to ${receiverName.userName}`;
-            const receiverDescription = `You have Received Amount: ${amount} from ${user.userName}`;
-            account.balance -= Number(amount);
-            receiver.balance += Number(amount);
-            //record to:from transaction
-            const receiverTransaction = new Transaction({
-                title: 'TRANSFER',
-                amount,
-                account: receiver.id,
-                description: senderDescription
+        if (account.balance !== undefined) {
+            if (account.balance < Number(amount)) {
+                description = description + ' failed due to Insufficient funds';
+                account.balance += 0;
+                const senderTransaction = new Transaction({
+                    title: 'TRANSFER',
+                    amount,
+                    account: accountId,
+                    description,
+                });
+                await senderTransaction.save();// from
+                //update sender:receiver transaction
+                account?.transactions?.push(senderTransaction.id);
+                await account.save();
+            } else {
+                const senderDescription = `You have Transferred Amount: ${amount} to ${receiverName?.username}`;
+                const receiverDescription = `You have Received Amount: ${amount} from ${user?.username}`;
+                account.balance -= Number(amount);
+                if (receiver.balance !== undefined) {
+                    receiver.balance += Number(amount);
+                }
+                //record to:from transaction
+                const receiverTransaction = new Transaction({
+                    title: 'TRANSFER',
+                    amount,
+                    account: receiver.id,
+                    description: senderDescription
 
-            });
-            const senderTransaction = new Transaction({
-                title: 'TRANSFER',
-                amount,
-                account: accountId,
-                description: receiverDescription
-            });
-            await receiverTransaction.save(); //to
-            await senderTransaction.save();// from
-            //update sender:receiver transaction
-            account.transactions.push(senderTransaction.id);
-            receiver.transactions.push(receiverTransaction.id);
+                });
+                const senderTransaction = new Transaction({
+                    title: 'TRANSFER',
+                    amount,
+                    account: accountId,
+                    description: receiverDescription
+                });
+                await receiverTransaction.save(); //to
+                await senderTransaction.save();// from
+                //update sender:receiver transaction
+                account?.transactions?.push(senderTransaction.id);
+                receiver?.transactions?.push(receiverTransaction.id);
 
-            await account.save();
-            await receiver.save();
+                await account.save();
+                await receiver.save();
+            }
+
         }
+
         res.send({ description });
     } catch (error: any) {
         //handle req.params
@@ -170,11 +180,11 @@ export const withdrawAmount = async function (req: Request, res: Response) {
     let account;
     try {
         account = await Account.findById(accountId);
-        //does the account exist?
+        //does the account exist
         if (!account) {
             return res.status(400).json({ msg: 'Bank Account does not exist!' });
         }
-        if (account.owner.toString() !== id) {
+        if (account?.owner?.toString() !== id) {
             return res.status(401)
                 .json({
                     msg: 'Unauthorised'
@@ -187,38 +197,40 @@ export const withdrawAmount = async function (req: Request, res: Response) {
         }
         //make withdrawal
         //check available blance
-        if (account.balance < Number(amount)) {
-            description = `Withdrawal of amount: ${amount} failed due to Insufficient funds`;
-            account.balance -= 0;
-            const transaction = new Transaction({
-                title: 'WITHDRAWAL',
-                amount,
-                account: accountId,
-                description
-            });
-            //record transaction
-            await transaction.save();
-            account.transactions.push(transaction.id);
-            //save acc changes
-            await account.save();
-        } else {
-            description = `Withdrawal of amount: ${amount} was Successful`;
-            account.balance -= Number(amount);
-            //record transaction
-            const transaction = new Transaction({
-                title: 'WITHDRAWAL',
-                amount,
-                account: accountId,
-                description
-            });
-            //record transaction
-            await transaction.save();
-            account.transactions.push(transaction.id);
-            //save acc changes
-            await account.save();
+        if (account.balance !== undefined) {
+            if (account!.balance < Number(amount)) {
+                description = `Withdrawal of amount: ${amount} failed due to Insufficient funds`;
+                account!.balance -= 0;
+                const transaction = new Transaction({
+                    title: 'WITHDRAWAL',
+                    amount,
+                    account: accountId,
+                    description
+                });
+                //record transaction
+                await transaction.save();
+                account?.transactions?.push(transaction.id);
+                //save acc changes
+                await account.save();
+            } else {
+                description = `Withdrawal of amount: ${amount} was Successful`;
+                if (account !== undefined) {
+                    account.balance -= Number(amount);
+                }
+                //record transaction
+                const transaction = new Transaction({
+                    title: 'WITHDRAWAL',
+                    amount,
+                    account: accountId,
+                    description
+                });
+                //record transaction
+                await transaction.save();
+                account?.transactions?.push(transaction.id);
+                //save acc changes
+                await account.save();
+            }
         }
-
-
         res.send({ description });
 
 
@@ -236,7 +248,7 @@ export const getFinalBalances = async function (req: Request, res: Response) {
         const accounts = await Account.find().populate("owner")
         const balances = await Promise.all(
             accounts.map((account: any) => ({
-                userName: account.owner.userName,
+                username: account.owner.username,
                 balance: account.balance
             }))
         )

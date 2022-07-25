@@ -1,9 +1,15 @@
-import mongoose from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
 const ObjectId = mongoose.Schema.Types.ObjectId;
 const { Schema } = mongoose;
-const UserSchema = new Schema({
-
-    userName: {
+//Document interface
+export interface User {
+    username: string;
+    password: string;
+    account: ObjectId;
+    pin: number;
+}
+const UserSchema = new Schema<User>({
+    username: {
         type: String,
         required: true,
         unique: true

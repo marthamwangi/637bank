@@ -1,6 +1,6 @@
 var transactionsRouter = require("express").Router();
-import { auth } from '../../middlewares/auth';
-import { depositAmount, transferAmount, withdrawAmount } from '../../controllers/account.controller';
+import { auth } from '../../shared-middlewares/auth';
+import { depositAmount, transferAmount, withdrawAmount } from '../../shared-controllers/account.controller';
 transactionsRouter
     .route('/:accountId/deposit')
     .post([auth], depositAmount)

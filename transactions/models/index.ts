@@ -3,7 +3,7 @@ export const model = {
     create(transaction: any) {
         return transactionModel.find(transaction);
     },
-    get({ query }) {
+    get({ query }: any) {
         return transactionModel.find(query);
     }
 }

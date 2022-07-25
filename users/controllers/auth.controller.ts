@@ -1,14 +1,12 @@
-import { Response, Request } from "express";
-import User from "../users/schema";
+import { Response, Request, NextFunction } from "express";
+import Joi from "joi";
+import User from "../schema";
 import jwt from "jsonwebtoken";
-export const registerUser = async function (req: Request, res: Response) {
-    const { userName, password } = req.body;
-    let user = new User({
-        userName,
-        password
-    })
+import config from "../../config/config";
+export const registerUser = async function (req: Request, res: Response, next: NextFunction) {
+    let user = new User(req.body);
     try {
-        let existingUser = await User.findOne({ userName });
+        let existingUser = await User.findOne({ username: req.body.username });
         if (existingUser) {
             return res
                 .status(400)
@@ -19,22 +17,22 @@ export const registerUser = async function (req: Request, res: Response) {
             .status(200)
             .send({ msg: "User registered!" })
     }
-    catch (err: any) {
+    catch (error: any) {
 
-        if (err.code === 11000) {
+        if (error.code.includes("duplicate key error collection")) {
             return res
                 .status(400)
-                .send({ err: "User already exists" });
+                .send({ error: "User already exists" });
 
         }
-        res.status(500).send({ err: err.message });
+        res.status(500).send({ error: "Internal server error" }); //don't send error to client
     }
 }
 export const loginUser = async function (req: Request, res: Response) {
-    const { userName, password } = req.body;
+    const { username, password } = req.body;
     let user: any;
     try {
-        user = await User.findOne({ userName, password });
+        user = await User.findOne({ username, password });
 
     } catch (error: any) {
         if (error.code === 400) {
@@ -51,7 +49,7 @@ export const loginUser = async function (req: Request, res: Response) {
         const payload = {
             id: user.id
         }
-        jwt.sign(payload, "secret", { expiresIn: 28800000 }, (err: any, token: any) => {
+        jwt.sign(payload, config.secret, { expiresIn: 28800000 }, (err: any, token: any) => {
             if (err) {
                 return res
                     .status(400)
@@ -59,7 +57,7 @@ export const loginUser = async function (req: Request, res: Response) {
             }
 
             res.json({
-                userName,
+                username,
                 token
             });
         })

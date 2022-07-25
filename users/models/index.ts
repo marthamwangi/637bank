@@ -4,7 +4,7 @@ export const model = {
     create(user: any) {
         return userModel.create(user);
     },
-    get({ query }) {
+    get(query: any) {
         return userModel.find(query);
     }
 }
