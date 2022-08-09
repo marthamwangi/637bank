@@ -3,30 +3,41 @@ import Joi from "joi";
 import User from "../schema";
 import jwt from "jsonwebtoken";
 import config from "../../config/config";
+import { createUser } from "../services";
+//user interface
 export const registerUser = async function (req: Request, res: Response, next: NextFunction) {
-    let user = new User(req.body);
     try {
-        let existingUser = await User.findOne({ username: req.body.username });
-        if (existingUser) {
-            return res
-                .status(400)
-                .send({ err: "User already exists" });
-        }
-        await user.save();
-        return res
-            .status(200)
-            .send({ msg: "User registered!" })
+        const user = await createUser(req.body)
+        jwt.sign(user, config.secret, { expiresIn: 28800000 }, (err: any, token: string) => {
+            return res.json({ token });
+        })
+    } catch (error) {
+        return next(error);
     }
-    catch (error: any) {
 
-        if (error.code.includes("duplicate key error collection")) {
-            return res
-                .status(400)
-                .send({ error: "User already exists" });
+    // let user = new User(req.body);
+    // try {
+    //     let existingUser = await User.findOne({ username: req.body.username });
+    //     if (existingUser) {
+    //         return res
+    //             .status(400)
+    //             .send({ err: "User already exists" });
+    //     }
+    //     await user.save();
+    //     return res
+    //         .status(200)
+    //         .send({ msg: "User registered!" })
+    // }
+    // catch (error: any) {
 
-        }
-        res.status(500).send({ error: "Internal server error" }); //don't send error to client
-    }
+    //     if (error.code.includes("duplicate key error collection")) {
+    //         return res
+    //             .status(400)
+    //             .send({ error: "User already exists" });
+
+    //     }
+    //     res.status(500).send({ error: "Internal server error" }); //don't send error to client
+    // }
 }
 export const loginUser = async function (req: Request, res: Response) {
     const { username, password } = req.body;
